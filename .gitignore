@@ -1,0 +1,78 @@
+### Build output ###
+target/
+build/
+out/
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+.mvn/wrapper/maven-wrapper.jar
+.gradle/
+*.class
+*.jar
+*.war
+!gradle/wrapper/gradle-wrapper.jar
+
+### Spring Initializr boilerplate ###
+HELP.md
+
+### Logs ###
+*.log
+logs/
+hs_err_pid*
+replay_pid*
+
+### Environment & local configuration ###
+.env
+.env.*
+!.env.example
+application-local.properties
+application-local.yml
+application-local.yaml
+application-*-local.properties
+src/main/resources/application-prod.properties
+src/main/resources/application-prod.yml
+
+### Secrets & credentials ###
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+*.crt
+*.cer
+secrets/
+credentials*.json
+service-account*.json
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse / STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### OS ###
+.DS_Store
+Thumbs.db
+desktop.ini
