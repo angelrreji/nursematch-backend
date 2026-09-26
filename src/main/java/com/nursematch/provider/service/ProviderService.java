@@ -25,15 +25,13 @@ public class ProviderService {
     private final UserRepository userRepository;
     private final GeocodingClient geocodingClient;
 
-    // inject SmartyStreetsClient
-
     public ProviderProfileResponse createProfile(String email, ProviderProfileRequest req) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (providerRepository.existsByUserId(user.getId())) {
-            throw new RuntimeException("Provider profile already exists");
+            throw new IllegalStateException("Provider profile already exists");
         }
 
         GeocodeResult geo = geocodingClient.geocode(
@@ -61,10 +59,35 @@ public class ProviderService {
     public ProviderProfileResponse getProfile(String email) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         ProviderProfile profile = providerRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Provider profile not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found"));
+
+        return toResponse(profile);
+    }
+
+    public ProviderProfileResponse updateProfile(String email, ProviderProfileRequest req) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        ProviderProfile profile = providerRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found"));
+
+        GeocodeResult geo = geocodingClient.geocode(
+                req.getAddress(), req.getCity(), req.getState()
+        );
+
+        profile.setCredentials(req.getCredentials());
+        profile.setLicenseState(req.getLicenseState());
+        profile.setSpecialties(req.getSpecialties());
+        profile.setCity(req.getCity());
+        profile.setState(req.getState());
+        profile.setLat(geo.getLat());
+        profile.setLng(geo.getLng());
+
+        providerRepository.save(profile);
 
         return toResponse(profile);
     }
@@ -72,10 +95,10 @@ public class ProviderService {
     public ProviderProfileResponse addAvailability(String email, AvailabilitySlotDTO dto) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         ProviderProfile profile = providerRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Provider profile not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found"));
 
         AvailabilitySlot slot = new AvailabilitySlot();
         slot.setStartDate(dto.getStartDate());
@@ -91,10 +114,10 @@ public class ProviderService {
     public ProviderProfileResponse toggleAccepting(String email, boolean accepting) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         ProviderProfile profile = providerRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Provider profile not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found"));
 
         profile.setAcceptingStudents(accepting);
         providerRepository.save(profile);

@@ -3,6 +3,7 @@ package com.nursematch.student.model;
 import com.nursematch.rotation.model.RotationRequest;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,6 +17,9 @@ public class StudentProfile {
 
     @Id
     private String id;
+
+    @Version
+    private Long version;
 
     @Indexed(unique = true)
     private String userId;        // FK reference to User._id

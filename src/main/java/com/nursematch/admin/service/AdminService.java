@@ -28,7 +28,7 @@ public class AdminService {
                 .orElseThrow(() -> new ResourceNotFoundException("Match not found"));
 
         if (!match.isDepositPaid()) {
-            throw new RuntimeException("Cannot confirm match before deposit is paid");
+            throw new IllegalStateException("Cannot confirm match before deposit is paid");
         }
 
         match.setStatus(MatchStatus.CONFIRMED);
@@ -43,7 +43,7 @@ public class AdminService {
                 .orElseThrow(() -> new ResourceNotFoundException("Match not found"));
 
         if (match.getStatus() != MatchStatus.CONFIRMED) {
-            throw new RuntimeException("Match must be confirmed before completion");
+            throw new IllegalStateException("Match must be confirmed before completion");
         }
 
         match.setStatus(MatchStatus.COMPLETED);

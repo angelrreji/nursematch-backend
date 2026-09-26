@@ -30,10 +30,10 @@ public class RotationService {
     public List<RotationRequestDTO> getRequests(String email) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         StudentProfile profile = profileRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
 
         return profile.getRotationRequests().stream()
                 .map(this::toDTO)

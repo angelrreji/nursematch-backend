@@ -27,6 +27,11 @@ public class ProviderController {
         return ResponseEntity.ok(providerService.getProfile(auth.getName()));
     }
 
+    @PutMapping("/profile")
+    public ResponseEntity<ProviderProfileResponse> updateProfile(@RequestBody @Valid ProviderProfileRequest req, Authentication auth) {
+        return ResponseEntity.ok(providerService.updateProfile(auth.getName(), req));
+    }
+
     @PostMapping("/availability")
     public ResponseEntity<ProviderProfileResponse> addAvailability(@RequestBody @Valid AvailabilitySlotDTO dto, Authentication auth) {
         return ResponseEntity.ok(providerService.addAvailability(auth.getName(), dto));

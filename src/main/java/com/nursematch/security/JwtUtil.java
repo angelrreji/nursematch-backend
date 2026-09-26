@@ -2,6 +2,7 @@ package com.nursematch.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,9 +18,22 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expiration;
 
-    private Key getSigningKey() {
+    private Key signingKey;
+
+    @PostConstruct
+    void init() {
+        if (secret == null || !secret.matches("^[0-9a-fA-F]+$") || secret.length() % 2 != 0) {
+            throw new IllegalStateException("JWT_SECRET must be a valid hex string");
+        }
         byte[] keyBytes = hexStringToByteArray(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
+        if (keyBytes.length < 32) {
+            throw new IllegalStateException("JWT_SECRET must decode to at least 32 bytes (64 hex chars) for HS256");
+        }
+        signingKey = Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private Key getSigningKey() {
+        return signingKey;
     }
 
     public String generateToken(String email, String role) {

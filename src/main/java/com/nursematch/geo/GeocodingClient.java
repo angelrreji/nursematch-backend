@@ -3,10 +3,13 @@ package com.nursematch.geo;
 import com.nursematch.geo.dto.GeocodeResult;
 import com.nursematch.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -25,17 +28,19 @@ public class GeocodingClient {
 
         String query = address + ", " + city + ", " + state;
 
-        String url = baseUrl
-                + "?q=" + query.replace(" ", "+")
-                + "&format=json"
-                + "&limit=1"
-                + "&addressdetails=1";
+        URI uri = UriComponentsBuilder.fromUriString(baseUrl)
+                .queryParam("q", query)
+                .queryParam("format", "json")
+                .queryParam("limit", 1)
+                .queryParam("addressdetails", 1)
+                .build()
+                .toUri();
 
         List<Map<String, Object>> response = restClient.get()
-                .uri(url)
+                .uri(uri)
                 .header(HttpHeaders.USER_AGENT, userAgent)
                 .retrieve()
-                .body(List.class);
+                .body(new ParameterizedTypeReference<List<Map<String, Object>>>() {});
 
         if (response == null || response.isEmpty()) {
             throw new ResourceNotFoundException("Address could not be geocoded");

@@ -1,5 +1,6 @@
 package com.nursematch.match.service;
 
+import com.nursematch.exception.ResourceNotFoundException;
 import com.nursematch.geo.GeoUtils;
 import com.nursematch.provider.dto.ProviderResultDTO;
 import com.nursematch.provider.model.AvailabilitySlot;
@@ -31,15 +32,15 @@ public class MatchDiscoveryService {
 
         // 1. Load student + rotation request
         User student = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         StudentProfile profile = studentProfileRepository.findByUserId(student.getId())
-                .orElseThrow(() -> new RuntimeException("Student profile not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Student profile not found"));
 
         RotationRequest request = profile.getRotationRequests().stream()
                 .filter(r -> r.getId().equals(requestId))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Rotation request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Rotation request not found"));
 
         // 2. DB filter — hits compound index {specialties, state, acceptingStudents}
         List<ProviderProfile> candidates = providerRepository

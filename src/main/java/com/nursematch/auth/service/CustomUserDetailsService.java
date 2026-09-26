@@ -1,4 +1,4 @@
-package com.nursematch.auth;
+package com.nursematch.auth.service;
 
 import com.nursematch.user.model.User;
 import com.nursematch.user.repository.UserRepository;

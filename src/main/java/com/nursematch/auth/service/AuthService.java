@@ -3,7 +3,9 @@ package com.nursematch.auth.service;
 import com.nursematch.auth.dto.AuthResponse;
 import com.nursematch.auth.dto.LoginRequest;
 import com.nursematch.auth.dto.RegisterRequest;
+import com.nursematch.exception.ResourceNotFoundException;
 import com.nursematch.security.JwtUtil;
+import com.nursematch.user.model.Role;
 import com.nursematch.user.model.User;
 import com.nursematch.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,11 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public String register(RegisterRequest req) {
+        if (req.getRole() == Role.ADMIN) {
+            throw new IllegalArgumentException("Cannot self-register as admin");
+        }
         if (userRepository.existsByEmail(req.getEmail())) {
-            throw new RuntimeException("Email already registered");
+            throw new IllegalStateException("Email already registered");
         }
 
         User user = new User();
@@ -42,7 +47,7 @@ public class AuthService {
         );
 
         User user = userRepository.findByEmail(req.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
 

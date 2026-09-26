@@ -1,5 +1,6 @@
 package com.nursematch.student.service;
 
+import com.nursematch.exception.ResourceNotFoundException;
 import com.nursematch.student.dto.StudentProfileRequest;
 import com.nursematch.student.dto.StudentProfileResponse;
 import com.nursematch.student.model.StudentProfile;
@@ -19,10 +20,10 @@ public class StudentService {
     public StudentProfileResponse createProfile(String email, StudentProfileRequest req) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (profileRepository.existsByUserId(user.getId())) {
-            throw new RuntimeException("Profile already exists");
+            throw new IllegalStateException("Profile already exists");
         }
 
         StudentProfile profile = new StudentProfile();
@@ -43,10 +44,27 @@ public class StudentService {
     public StudentProfileResponse getProfile(String email) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         StudentProfile profile = profileRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
+
+        return toResponse(profile);
+    }
+
+    public StudentProfileResponse updateProfile(String email, StudentProfileRequest req) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        StudentProfile profile = profileRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
+
+        profile.setUniversity(req.getUniversity());
+        profile.setProgram(req.getProgram());
+        profile.setGraduationDate(req.getGraduationDate());
+
+        profileRepository.save(profile);
 
         return toResponse(profile);
     }

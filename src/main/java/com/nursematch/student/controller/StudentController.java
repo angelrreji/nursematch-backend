@@ -25,4 +25,9 @@ public class StudentController {
     public ResponseEntity<StudentProfileResponse> getProfile(Authentication auth) {
         return ResponseEntity.ok(studentService.getProfile(auth.getName()));
     }
+
+    @PutMapping("/profile")
+    public ResponseEntity<StudentProfileResponse> updateProfile(@RequestBody @Valid StudentProfileRequest req, Authentication auth) {
+        return ResponseEntity.ok(studentService.updateProfile(auth.getName(), req));
+    }
 }
